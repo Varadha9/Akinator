@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: akinator-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - akinator-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../Dockerfile.backend
+    container_name: akinator-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongodb:27017/akinator
+      - NODE_ENV=production
+    depends_on:
+      - mongodb
+    networks:
+      - akinator-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../Dockerfile.frontend
+    container_name: akinator-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - akinator-network
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+
+networks:
+  akinator-network:
+    driver: bridge

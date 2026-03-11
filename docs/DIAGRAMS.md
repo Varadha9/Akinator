@@ -1,0 +1,440 @@
+# 🎨 Akinator AI - Visual System Diagrams
+
+## 🏗️ System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         USER INTERFACE                           │
+│                                                                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │ Start Screen │  │Question Screen│  │ Guess Screen │          │
+│  │              │  │               │  │              │          │
+│  │ • Categories │  │ • Progress    │  │ • Character  │          │
+│  │ • Start Btn  │  │ • Question    │  │ • Confidence │          │
+│  │              │  │ • 5 Answers   │  │ • Feedback   │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+│                                                                   │
+│                    React Components + CSS                        │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+                            │ HTTP/REST API
+                            │ (Axios)
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      API GATEWAY LAYER                           │
+│                                                                   │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │              Express.js Server (Port 5000)                │  │
+│  │                                                            │  │
+│  │  POST /api/start-game          → Start new session       │  │
+│  │  POST /api/answer-question     → Process answer          │  │
+│  │  POST /api/submit-feedback     → Record result           │  │
+│  │  POST /api/submit-new-character → Learn character        │  │
+│  │  GET  /api/stats               → Get statistics          │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                   │
+│                    Controllers + Routes                          │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+                            │ Function Calls
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      AI ENGINE LAYER                             │
+│                                                                   │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                    Game Manager                           │  │
+│  │  • Session Management                                     │  │
+│  │  • State Tracking                                         │  │
+│  │  • Component Coordination                                 │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                            │                                     │
+│         ┌──────────────────┼──────────────────┐                 │
+│         ▼                  ▼                  ▼                 │
+│  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │  Question   │  │ Probability  │  │    Guess     │          │
+│  │  Selector   │  │   Engine     │  │  Generator   │          │
+│  │             │  │              │  │              │          │
+│  │ Info Gain   │  │  Bayesian    │  │ Prediction   │          │
+│  │ Algorithm   │  │  Scoring     │  │ Logic        │          │
+│  └─────────────┘  └──────────────┘  └──────────────┘          │
+│                                                                   │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+                            │ MongoDB Queries
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    DATABASE LAYER                                │
+│                                                                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │  Questions   │  │  Characters  │  │  Game Logs   │          │
+│  │              │  │              │  │              │          │
+│  │ • 55 Qs     │  │ • 100+ Chars │  │ • History    │          │
+│  │ • Categories │  │ • Profiles   │  │ • Analytics  │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+│                                                                   │
+│                    MongoDB Collections                           │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## 🔄 Game Flow Diagram
+
+```
+                    ┌─────────────┐
+                    │   START     │
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │ User Clicks │
+                    │ Start Game  │
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │   Create    │
+                    │  Session    │
+                    └──────┬──────┘
+                           │
+                           ▼
+        ┌──────────────────────────────────┐
+        │                                   │
+        │    QUESTION-ANSWER LOOP          │
+        │                                   │
+        │  ┌─────────────────────────┐    │
+        │  │ Select Best Question    │    │
+        │  │ (Information Gain)      │    │
+        │  └───────────┬─────────────┘    │
+        │              │                   │
+        │              ▼                   │
+        │  ┌─────────────────────────┐    │
+        │  │ Display Question        │    │
+        │  │ to User                 │    │
+        │  └───────────┬─────────────┘    │
+        │              │                   │
+        │              ▼                   │
+        │  ┌─────────────────────────┐    │
+        │  │ User Answers            │    │
+        │  │ (Yes/No/Probably/etc)   │    │
+        │  └───────────┬─────────────┘    │
+        │              │                   │
+        │              ▼                   │
+        │  ┌─────────────────────────┐    │
+        │  │ Update Probabilities    │    │
+        │  │ (Bayesian Scoring)      │    │
+        │  └───────────┬─────────────┘    │
+        │              │                   │
+        │              ▼                   │
+        │  ┌─────────────────────────┐    │
+        │  │ Check Confidence        │    │
+        │  │ Threshold (70%)         │    │
+        │  └───────────┬─────────────┘    │
+        │              │                   │
+        └──────────────┼───────────────────┘
+                       │
+            ┌──────────┴──────────┐
+            │                     │
+         Low│                     │High
+            ▼                     ▼
+    ┌──────────────┐      ┌──────────────┐
+    │ Continue     │      │ Make Guess   │
+    │ Asking       │      │              │
+    └──────┬───────┘      └──────┬───────┘
+           │                     │
+           └──────────┬──────────┘
+                      │
+                      ▼
+              ┌──────────────┐
+              │ Display      │
+              │ Character    │
+              └──────┬───────┘
+                     │
+          ┌──────────┴──────────┐
+          │                     │
+      Correct                 Wrong
+          │                     │
+          ▼                     ▼
+   ┌──────────────┐      ┌──────────────┐
+   │ Log Success  │      │ Learn New    │
+   │              │      │ Character    │
+   └──────┬───────┘      └──────┬───────┘
+          │                     │
+          └──────────┬──────────┘
+                     │
+                     ▼
+              ┌──────────────┐
+              │     END      │
+              └──────────────┘
+```
+
+## 🧠 AI Algorithm Flow
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              INFORMATION GAIN ALGORITHM                      │
+│                                                               │
+│  Input: Current character probabilities                      │
+│                                                               │
+│  For each unasked question:                                  │
+│    1. Calculate current entropy                              │
+│       H(S) = -Σ p(x) * log₂(p(x))                           │
+│                                                               │
+│    2. Simulate each answer (yes/no/probably/etc)            │
+│                                                               │
+│    3. Calculate expected entropy after answer                │
+│       E[H] = Σ P(answer) * H(subset)                        │
+│                                                               │
+│    4. Calculate information gain                             │
+│       IG = H(current) - E[H]                                │
+│                                                               │
+│  Output: Question with maximum IG                            │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│              BAYESIAN PROBABILITY ENGINE                     │
+│                                                               │
+│  Input: User answer + Character profiles                     │
+│                                                               │
+│  For each character:                                         │
+│    1. Compare user answer with character profile             │
+│                                                               │
+│    2. Calculate compatibility score:                         │
+│       • Perfect match: +2.0                                  │
+│       • Compatible: +1.0                                     │
+│       • Neutral: 0.0                                         │
+│       • Conflict: -2.0                                       │
+│                                                               │
+│    3. Apply bonuses/penalties:                               │
+│       • Match bonus: +1.5 per match                          │
+│       • Mismatch penalty: -2.0 per conflict                  │
+│                                                               │
+│    4. Convert to probability using softmax:                  │
+│       P(C) = exp(score) / Σ exp(all scores)                 │
+│                                                               │
+│  Output: Updated probability distribution                    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## 📊 Data Flow Diagram
+
+```
+┌──────────┐
+│  User    │
+└────┬─────┘
+     │ 1. Start Game
+     ▼
+┌──────────────┐
+│  Frontend    │
+└────┬─────────┘
+     │ 2. POST /start-game
+     ▼
+┌──────────────┐
+│   Backend    │
+└────┬─────────┘
+     │ 3. Create Session
+     ▼
+┌──────────────┐
+│ Game Manager │
+└────┬─────────┘
+     │ 4. Initialize
+     ▼
+┌──────────────┐
+│   Database   │ ← Load Questions & Characters
+└────┬─────────┘
+     │ 5. Return Data
+     ▼
+┌──────────────┐
+│Question      │
+│Selector      │ ← Select Best Question
+└────┬─────────┘
+     │ 6. Return Question
+     ▼
+┌──────────────┐
+│  Frontend    │ ← Display Question
+└────┬─────────┘
+     │ 7. User Answers
+     ▼
+┌──────────────┐
+│  Backend     │
+└────┬─────────┘
+     │ 8. Process Answer
+     ▼
+┌──────────────┐
+│Probability   │
+│Engine        │ ← Update Scores
+└────┬─────────┘
+     │ 9. New Probabilities
+     ▼
+┌──────────────┐
+│Guess         │
+│Generator     │ ← Check Threshold
+└────┬─────────┘
+     │ 10. Decision
+     ▼
+┌──────────────┐
+│  Frontend    │ ← Show Result
+└────┬─────────┘
+     │ 11. User Feedback
+     ▼
+┌──────────────┐
+│  Database    │ ← Log Result
+└──────────────┘
+```
+
+## 🗄️ Database Schema Diagram
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        QUESTIONS                             │
+├─────────────────────────────────────────────────────────────┤
+│ _id          : ObjectId (Primary Key)                       │
+│ text         : String (Unique)                              │
+│ category     : String (Enum)                                │
+│ createdAt    : Date                                         │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            │ Referenced by
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│                       CHARACTERS                             │
+├─────────────────────────────────────────────────────────────┤
+│ _id          : ObjectId (Primary Key)                       │
+│ name         : String (Unique)                              │
+│ category     : String (Enum)                                │
+│ answers      : Array                                        │
+│   ├─ questionId : ObjectId (Foreign Key → Questions)       │
+│   └─ answer     : String (Enum)                            │
+│ imageUrl     : String (Optional)                            │
+│ createdAt    : Date                                         │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            │ Referenced by
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│                        GAME LOGS                             │
+├─────────────────────────────────────────────────────────────┤
+│ _id              : ObjectId (Primary Key)                   │
+│ sessionId        : String (Unique)                          │
+│ answers          : Array                                    │
+│   ├─ questionId  : ObjectId                                │
+│   ├─ questionText: String                                  │
+│   └─ answer      : String                                  │
+│ guessedCharacter : ObjectId (Foreign Key → Characters)     │
+│ actualCharacter  : String                                   │
+│ success          : Boolean                                  │
+│ timestamp        : Date                                     │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## 🎯 Component Hierarchy
+
+```
+App
+ └── Game
+      ├── StartScreen
+      │    ├── Title
+      │    ├── Instructions
+      │    ├── StartButton
+      │    └── CategoryButtons
+      │
+      ├── QuestionScreen
+      │    ├── ProgressBar
+      │    ├── QuestionText
+      │    └── AnswerButtons (5)
+      │         ├── Yes
+      │         ├── Probably
+      │         ├── Don't Know
+      │         ├── Probably Not
+      │         └── No
+      │
+      ├── GuessScreen
+      │    ├── CrystalBall (Animation)
+      │    ├── CharacterCard
+      │    │    ├── CharacterName
+      │    │    └── ConfidenceMeter
+      │    └── FeedbackButtons
+      │         ├── Correct
+      │         └── Wrong
+      │
+      ├── LearningScreen
+      │    ├── Form
+      │    │    ├── CharacterNameInput
+      │    │    ├── CategorySelect
+      │    │    ├── QuestionInput
+      │    │    └── AnswerSelect
+      │    └── FormButtons
+      │         ├── Submit
+      │         └── Skip
+      │
+      └── EndScreen
+           ├── ThankYouMessage
+           └── PlayAgainButton
+```
+
+## 🚀 Deployment Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      PRODUCTION                              │
+└─────────────────────────────────────────────────────────────┘
+
+                    ┌──────────────┐
+                    │   Internet   │
+                    └──────┬───────┘
+                           │
+                ┌──────────┴──────────┐
+                │                     │
+                ▼                     ▼
+        ┌──────────────┐      ┌──────────────┐
+        │  CloudFront  │      │     ALB      │
+        │     (CDN)    │      │(Load Balancer)│
+        └──────┬───────┘      └──────┬───────┘
+               │                     │
+               ▼                     ▼
+        ┌──────────────┐      ┌──────────────┐
+        │   S3 Bucket  │      │  EC2 Cluster │
+        │  (Frontend)  │      │  (Backend)   │
+        └──────────────┘      └──────┬───────┘
+                                     │
+                                     ▼
+                              ┌──────────────┐
+                              │   MongoDB    │
+                              │    Atlas     │
+                              └──────────────┘
+```
+
+## 📦 Docker Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Docker Compose                            │
+└─────────────────────────────────────────────────────────────┘
+                           │
+        ┌──────────────────┼──────────────────┐
+        │                  │                  │
+        ▼                  ▼                  ▼
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│   MongoDB    │  │   Backend    │  │  Frontend    │
+│  Container   │  │  Container   │  │  Container   │
+│              │  │              │  │              │
+│ Port: 27017  │  │ Port: 5000   │  │ Port: 3000   │
+│              │  │              │  │              │
+│ Volume:      │  │ Node.js +    │  │ Nginx +      │
+│ mongodb_data │  │ Express      │  │ React Build  │
+└──────────────┘  └──────────────┘  └──────────────┘
+        │                  │                  │
+        └──────────────────┼──────────────────┘
+                           │
+                    akinator-network
+```
+
+---
+
+**Legend:**
+- `→` : Data flow
+- `▼` : Process flow
+- `├─` : Hierarchy
+- `│` : Connection
+
+---
+
+These diagrams provide a visual understanding of the Akinator AI system architecture, data flow, and component relationships.
