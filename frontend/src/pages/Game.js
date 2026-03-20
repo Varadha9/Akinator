@@ -25,18 +25,15 @@ const Game = () => {
       const response = await startGame(category);
       setSessionId(response.sessionId);
       
-      // Get first question by answering with a dummy to trigger question flow
-      const firstResponse = await answerQuestion(response.sessionId, 'init', 'init');
-      
-      if (firstResponse.shouldGuess) {
-        setGuessedCharacter(firstResponse.guess.characterName);
-        setGuessedCharacterId(firstResponse.guess.characterId);
-        setConfidence(firstResponse.guess.confidence);
+      if (response.shouldGuess) {
+        setGuessedCharacter(response.guess.characterName);
+        setGuessedCharacterId(response.guess.characterId);
+        setConfidence(response.guess.confidence);
         setGameState('guess');
       } else {
-        setCurrentQuestion(firstResponse.question.text);
-        setCurrentQuestionId(firstResponse.question.id);
-        setProgress(firstResponse.progress || 0);
+        setCurrentQuestion(response.question.text);
+        setCurrentQuestionId(response.question.id);
+        setProgress(response.progress || 0);
         setQuestionNumber(1);
         setGameState('question');
       }

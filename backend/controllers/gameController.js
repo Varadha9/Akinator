@@ -13,11 +13,34 @@ exports.startGame = async (req, res) => {
     const { category = 'all' } = req.body;
     const sessionId = gameManager.createSession(category);
 
-    res.json({
-      success: true,
-      sessionId,
-      message: 'Game started successfully'
-    });
+    // Get first question immediately
+    const questions = await databaseService.getAllQuestions();
+    const characters = await databaseService.getAllCharacters();
+    const result = await gameManager.getNextQuestion(sessionId, questions, characters);
+
+    if (result.shouldGuess) {
+      res.json({
+        success: true,
+        sessionId,
+        shouldGuess: true,
+        guess: {
+          characterId: result.guess.character._id,
+          characterName: result.guess.character.name,
+          confidence: result.guess.confidence
+        }
+      });
+    } else {
+      res.json({
+        success: true,
+        sessionId,
+        shouldGuess: false,
+        question: {
+          id: result.question._id,
+          text: result.question.text
+        },
+        progress: result.progress
+      });
+    }
   } catch (error) {
     res.status(500).json({
       success: false,

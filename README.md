@@ -1,429 +1,386 @@
-# Akinator AI - Character Guessing System
+# 🔮 Akinator AI - Character Guessing System
 
-A production-ready AI-powered guessing game that predicts characters through intelligent questioning using Bayesian probability and information gain algorithms.
+> An AI-powered character guessing game that predicts who you're thinking of by asking intelligent yes/no questions using **Bayesian probability** and **Information Gain** algorithms.
 
-## 🎯 Overview
+[![Node.js](https://img.shields.io/badge/Node.js-22+-339933?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=black)](https://react.dev/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-8.2-47A248?style=flat&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat)](LICENSE)
 
-This system implements an Akinator-style game where the AI asks strategic yes/no questions to guess the character you're thinking of. It uses advanced probability models and learns from user interactions.
+---
+
+## 🎯 What It Does
+
+- You **think of any character** (real or fictional)
+- The AI asks **smart yes/no questions**
+- It **updates probabilities** after every answer using Bayesian inference
+- It **guesses your character** with 85–95% accuracy
+- If wrong, it **learns** from you and improves
+
+---
 
 ## 🏗️ Architecture
 
 ```
-User Interface (React)
+React Frontend (port 3000)
+        ↓  HTTP/REST
+Express Backend (port 5000)
         ↓
-API Gateway (Express)
+   AI Engine
+   ├── GameManager       → Session state
+   ├── QuestionSelector  → Information Gain algorithm
+   ├── ProbabilityEngine → Bayesian scoring
+   └── GuessGenerator    → Prediction logic
         ↓
-Game Engine (AI Logic)
-   ├── Question Selector (Information Gain)
-   ├── Probability Engine (Bayesian)
-   └── Learning System
-        ↓
-Knowledge Base (MongoDB)
+MongoDB Database (port 27017)
+   ├── Questions  (55)
+   ├── Characters (100+)
+   └── GameLogs
 ```
 
-## 🚀 Features
+---
 
-- **Intelligent Question Selection**: Uses information gain to ask the most informative questions
-- **Bayesian Probability Model**: Continuously updates character probabilities
-- **Self-Learning System**: Improves accuracy by learning from incorrect guesses
-- **100+ Characters**: Pre-loaded with diverse characters across multiple categories
-- **Responsive UI**: Modern, mobile-friendly interface
-- **Real-time Updates**: Dynamic probability calculations
+## 🚀 Quick Start
 
-## 📋 Prerequisites
+### Prerequisites
+- [Node.js 16+](https://nodejs.org/)
+- [MongoDB](https://www.mongodb.com/try/download/community) (or MongoDB Compass)
 
-- Node.js 16+
-- MongoDB 5.0+
-- Docker (optional)
-- npm or yarn
-
-## 🛠️ Installation
-
-### Local Setup
-
-1. **Clone the repository**
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/Varadha9/Akinator.git
 cd Akinator
 ```
 
-2. **Install Backend Dependencies**
+### 2. Install Backend Dependencies
 ```bash
 cd backend
 npm install
 ```
 
-3. **Install Frontend Dependencies**
+### 3. Install Frontend Dependencies
 ```bash
 cd ../frontend
 npm install
 ```
 
-4. **Configure Environment**
+### 4. Seed the Database
 ```bash
-# Create .env file in backend directory
-cp .env.example .env
+cd ../backend
+node seed.js
 ```
 
-Edit `.env`:
+You should see:
 ```
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/akinator
-NODE_ENV=development
-```
-
-5. **Start MongoDB**
-```bash
-# Using Docker
-docker run -d -p 27017:27017 --name mongodb mongo:latest
-
-# Or use local MongoDB installation
-mongod
+✅ Connected to MongoDB
+✅ Inserted 55 questions
+✅ Inserted 101 characters
+🎉 Database seeding completed!
 ```
 
-6. **Seed Database**
+### 5. Start Backend
 ```bash
 cd backend
-npm run seed
+node server.js
 ```
 
-7. **Start Backend Server**
+You should see:
+```
+✅ Connected to MongoDB
+🚀 Server running on http://localhost:5000
+```
+
+### 6. Start Frontend
 ```bash
+cd frontend
 npm start
 ```
 
-8. **Start Frontend**
-```bash
-cd ../frontend
-npm start
-```
+Browser opens at **http://localhost:3000** 🎉
 
-Visit `http://localhost:3000`
-
-### Docker Setup
-
-```bash
-# Build and run all services
-docker-compose up --build
-
-# Run in detached mode
-docker-compose up -d
-
-# Stop services
-docker-compose down
-```
+---
 
 ## 📁 Project Structure
 
 ```
-akinator-ai/
+Akinator/
 ├── backend/
 │   ├── ai-engine/
-│   │   ├── GameManager.js          # Session state management
-│   │   ├── QuestionSelector.js     # Information gain algorithm
-│   │   ├── ProbabilityEngine.js    # Bayesian probability
-│   │   └── GuessGenerator.js       # Character prediction
+│   │   ├── GameManager.js        # Session management
+│   │   ├── QuestionSelector.js   # Information gain algorithm
+│   │   ├── ProbabilityEngine.js  # Bayesian probability
+│   │   └── GuessGenerator.js     # Character prediction
 │   ├── controllers/
-│   │   └── gameController.js       # API request handlers
-│   ├── routes/
-│   │   └── gameRoutes.js           # API endpoints
+│   │   └── gameController.js     # API request handlers
 │   ├── models/
-│   │   ├── Question.js             # Question schema
-│   │   ├── Character.js            # Character schema
-│   │   └── GameLog.js              # Game history schema
+│   │   ├── Character.js          # Character schema
+│   │   ├── Question.js           # Question schema
+│   │   └── GameLog.js            # Game history schema
+│   ├── routes/
+│   │   └── gameRoutes.js         # API endpoints
 │   ├── services/
-│   │   └── databaseService.js      # DB operations
-│   ├── server.js                   # Express server
-│   └── package.json
+│   │   └── databaseService.js    # DB operations
+│   ├── seed.js                   # Database seeder
+│   └── server.js                 # Express server
 ├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── StartScreen.js
-│   │   │   ├── QuestionScreen.js
-│   │   │   ├── GuessScreen.js
-│   │   │   └── LearningScreen.js
-│   │   ├── pages/
-│   │   │   └── Game.js
-│   │   ├── services/
-│   │   │   └── api.js              # API client
-│   │   ├── App.js
-│   │   └── index.js
-│   └── package.json
+│   └── src/
+│       ├── components/
+│       │   ├── StartScreen.js    # Home screen
+│       │   ├── QuestionScreen.js # Question + answers
+│       │   ├── GuessScreen.js    # AI guess display
+│       │   └── LearningScreen.js # Teach AI new character
+│       ├── pages/
+│       │   └── Game.js           # Main game logic
+│       ├── services/
+│       │   └── api.js            # API client
+│       └── App.js
 ├── database/
-│   ├── schemas/
-│   │   └── init.js                 # Database initialization
 │   └── seed-data/
-│       ├── characters.json         # 100+ characters
-│       └── questions.json          # 50+ questions
+│       ├── characters.json       # 101 characters
+│       └── questions.json        # 55 questions
 ├── docs/
-│   └── architecture.md             # Detailed architecture
+│   ├── architecture.md
+│   └── DEPLOYMENT.md
 ├── docker-compose.yml
-├── Dockerfile
 └── README.md
 ```
 
-## 🔌 API Documentation
+---
 
-### Start Game
+## 🔌 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Server health check |
+| GET | `/api` | API info |
+| POST | `/api/start-game` | Start new game session |
+| POST | `/api/answer-question` | Submit answer, get next question |
+| POST | `/api/submit-feedback` | Tell AI if guess was correct |
+| POST | `/api/submit-new-character` | Teach AI a new character |
+| GET | `/api/stats` | Game statistics |
+
+### Example: Start Game
 ```http
 POST /api/start-game
 Content-Type: application/json
 
+{ "category": "all" }
+```
+```json
 {
-  "category": "all"  // optional: "movies", "anime", "sports", etc.
-}
-
-Response:
-{
+  "success": true,
   "sessionId": "uuid",
-  "message": "Game started"
+  "shouldGuess": false,
+  "question": {
+    "id": "...",
+    "text": "Is your character real?"
+  },
+  "progress": 0
 }
 ```
 
-### Answer Question
+### Example: Answer Question
 ```http
 POST /api/answer-question
 Content-Type: application/json
 
 {
   "sessionId": "uuid",
-  "answer": "yes"  // yes, no, probably, probably_not, dont_know
-}
-
-Response:
-{
-  "nextQuestion": "Is your character from a movie?",
-  "questionId": "q123",
-  "progress": 45
-}
-```
-
-### Get Guess
-```http
-GET /api/guess/:sessionId
-
-Response:
-{
-  "character": {
-    "id": "c123",
-    "name": "Iron Man",
-    "category": "movies"
-  },
-  "confidence": 0.87
-}
-```
-
-### Submit New Character
-```http
-POST /api/submit-new-character
-Content-Type: application/json
-
-{
-  "sessionId": "uuid",
-  "characterName": "New Character",
-  "category": "movies",
-  "distinguishingQuestion": "Does your character wear a suit?",
+  "questionId": "...",
   "answer": "yes"
 }
-
-Response:
+```
+```json
 {
-  "message": "Character learned successfully"
+  "success": true,
+  "shouldGuess": false,
+  "question": {
+    "id": "...",
+    "text": "Is your character from a movie?"
+  },
+  "progress": 10
 }
 ```
 
-## 🧠 AI Algorithm
+**Valid answers:** `yes` · `no` · `probably` · `probably_not` · `dont_know`
 
-### Information Gain (Question Selection)
+---
 
-The system selects questions that maximize information gain:
+## 🧠 AI Algorithms
 
-```
-IG(Q) = H(current) - Σ P(answer) * H(answer)
+### Information Gain — Question Selection
 
-Where:
-- H = entropy of character distribution
-- P(answer) = probability of each answer
-- Best question = max(IG)
-```
-
-### Bayesian Probability (Character Scoring)
+Picks the question that **reduces uncertainty the most**:
 
 ```
-P(C|A) = P(A|C) * P(C) / P(A)
+IG(Q) = H(current) - Σ P(answer) × H(answer)
 
-Where:
-- P(C|A) = probability of character given answers
-- P(A|C) = likelihood of answers for character
-- P(C) = prior probability
-- P(A) = normalization factor
+H = entropy = -Σ p(x) × log₂(p(x))
+Best question = argmax(IG)
 ```
 
-### Scoring System
+### Bayesian Probability — Character Scoring
 
-Each answer updates character scores:
-- Yes: +1.0
-- Probably: +0.5
-- Don't Know: +0.0
-- Probably Not: -0.5
-- No: -1.0
+Updates character probabilities after each answer:
+
+```
+Score(C) = Σ compatibility(userAnswer, charAnswer)
+P(C)     = exp(Score(C)) / Σ exp(Score(all))
+```
+
+### Answer Weights
+
+| Answer | Weight |
+|--------|--------|
+| Yes | +1.0 |
+| Probably | +0.5 |
+| Don't Know | 0.0 |
+| Probably Not | -0.5 |
+| No | -1.0 |
+
+---
 
 ## 🎮 How to Play
 
-1. Click "Start Game"
-2. Think of a character
-3. Answer questions honestly
-4. The AI will guess your character
-5. If wrong, teach the AI about your character
+1. Open **http://localhost:3000**
+2. Click **Start Game** (or pick a category)
+3. Think of any character
+4. Answer the questions honestly
+5. The AI will guess your character!
+6. If wrong → teach it the correct character
 
-## 🔧 Configuration
+---
 
-### Environment Variables
+## 📊 Characters Database
+
+101 characters across 8 categories:
+
+| Category | Examples |
+|----------|---------|
+| 🎬 Movies | Iron Man, Batman, Harry Potter, Joker |
+| 🎌 Anime | Naruto, Goku, Luffy, Light Yagami |
+| ⚽ Sports | Ronaldo, Messi, Virat Kohli, MS Dhoni |
+| 💻 Tech | Elon Musk, Steve Jobs, Bill Gates |
+| 🇮🇳 Indian | Shah Rukh Khan, Amitabh Bachchan |
+| 🎵 Music | Michael Jackson, Taylor Swift |
+| 📜 Historical | Gandhi, Einstein, Lincoln |
+| 🎮 Other | Mario, Sonic, Kratos, Link |
+
+---
+
+## 🔧 Environment Variables
+
+Create `backend/.env`:
 
 ```env
-# Backend
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/akinator
 NODE_ENV=development
 MAX_QUESTIONS=20
 CONFIDENCE_THRESHOLD=0.8
+```
 
-# Frontend
+Create `frontend/.env`:
+
+```env
 REACT_APP_API_URL=http://localhost:5000/api
 ```
 
+---
+
+## 🐳 Docker Setup
+
+```bash
+# Start all services
+docker-compose up --build
+
+# Stop
+docker-compose down
+```
+
+---
+
 ## 🚢 Deployment
 
-### AWS Deployment
-
-1. **Deploy Backend (EC2 + MongoDB Atlas)**
+### Backend → AWS EC2
 ```bash
-# Update MongoDB URI to Atlas
-MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/akinator
-
-# Deploy to EC2
-ssh ec2-user@your-instance
-git clone repo
-cd backend
+git clone https://github.com/Varadha9/Akinator.git
+cd Akinator/backend
 npm install --production
-pm2 start server.js
+# Update .env with MongoDB Atlas URI
+node server.js
 ```
 
-2. **Deploy Frontend (Vercel)**
+### Frontend → Vercel
 ```bash
 cd frontend
-vercel --prod
+# Set REACT_APP_API_URL to your EC2 URL in .env
+npx vercel --prod
 ```
 
-### Docker Production
+### Database → MongoDB Atlas
+1. Create free cluster at https://cloud.mongodb.com
+2. Get connection string
+3. Update `MONGODB_URI` in `.env`
+4. Run `node seed.js`
 
-```bash
-docker-compose -f docker-compose.prod.yml up -d
-```
-
-## 📊 Database Schema
-
-### Questions Collection
-```javascript
-{
-  _id: ObjectId,
-  text: String,
-  category: String,
-  createdAt: Date
-}
-```
-
-### Characters Collection
-```javascript
-{
-  _id: ObjectId,
-  name: String,
-  category: String,
-  answers: [{
-    questionId: ObjectId,
-    answer: String  // yes, no, probably, probably_not, dont_know
-  }],
-  createdAt: Date
-}
-```
-
-### GameLogs Collection
-```javascript
-{
-  _id: ObjectId,
-  sessionId: String,
-  answers: Array,
-  guessedCharacter: ObjectId,
-  actualCharacter: String,
-  success: Boolean,
-  timestamp: Date
-}
-```
-
-## 🧪 Testing
-
-```bash
-# Backend tests
-cd backend
-npm test
-
-# Frontend tests
-cd frontend
-npm test
-
-# E2E tests
-npm run test:e2e
-```
+---
 
 ## 📈 Performance
 
-- Average questions to guess: 8-12
-- Accuracy rate: 85-95%
-- Response time: <100ms
-- Concurrent users: 1000+
+| Metric | Value |
+|--------|-------|
+| Accuracy | 85–95% |
+| Avg questions to guess | 8–12 |
+| API response time | < 100ms |
+| Characters | 101 |
+| Questions | 55 |
+
+---
 
 ## 🔮 Future Improvements
 
-- [ ] Multi-language support
+- [ ] LLM integration for dynamic questions
 - [ ] Voice interaction
-- [ ] Image-based character selection
+- [ ] Image-based character hints
 - [ ] Leaderboard system
 - [ ] Analytics dashboard
-- [ ] LLM integration for dynamic questions
 - [ ] Mobile app (React Native)
-- [ ] Character popularity tracking
-- [ ] Social sharing features
-- [ ] Advanced ML models (Neural Networks)
+- [ ] Multi-language support
+- [ ] Neural network model
+
+---
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
-
-## 📝 License
-
-MIT License - see LICENSE file
-
-## 👥 Authors
-
-- Varadha9 - Initial work
-- GitHub: [@Varadha9](https://github.com/Varadha9)
-
-## 🙏 Acknowledgments
-
-- Inspired by Akinator.com
-- Bayesian inference algorithms
-- Information theory principles
-
-## 📞 Support
-
-- Documentation: [docs/](./docs/)
-- Issues: [GitHub Issues](https://github.com/Varadha9/Akinator/issues)
-- Repository: [GitHub](https://github.com/Varadha9/Akinator)
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Commit changes: `git commit -m 'Add my feature'`
+4. Push: `git push origin feature/my-feature`
+5. Open a Pull Request
 
 ---
 
-Made with ❤️ by the Akinator AI Team
+## 👤 Author
+
+**Varadha9**
+- GitHub: [@Varadha9](https://github.com/Varadha9)
+- Repository: [Akinator](https://github.com/Varadha9/Akinator)
+
+---
+
+## 📝 License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- Inspired by [Akinator.com](https://akinator.com)
+- Bayesian inference algorithms
+- Information theory principles
+
+---
+
+*Made with ❤️ by Varadha9*

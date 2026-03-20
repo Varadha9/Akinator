@@ -1,15 +1,11 @@
+require('dotenv').config();
+const mongoose = require('mongoose');
 const path = require('path');
+const Question = require('./models/Question');
+const Character = require('./models/Character');
 
-// Load dotenv from backend node_modules
-const dotenv = require(path.join(__dirname, '../../backend/node_modules/dotenv'));
-dotenv.config({ path: path.join(__dirname, '../../backend/.env') });
-
-const mongoose = require(path.join(__dirname, '../../backend/node_modules/mongoose'));
-const Question = require(path.join(__dirname, '../../backend/models/Question'));
-const Character = require(path.join(__dirname, '../../backend/models/Character'));
-
-const questionsData = require('./questions.json');
-const charactersData = require('./characters.json');
+const questionsData = require('../database/seed-data/questions.json');
+const charactersData = require('../database/seed-data/characters.json');
 
 async function seedDatabase() {
   try {
